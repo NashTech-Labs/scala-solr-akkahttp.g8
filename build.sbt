@@ -19,5 +19,7 @@ libraryDependencies ++= Seq(
  "com.typesafe.akka"    %% "akka-http-spray-json-experimental" % akkaV,
  "org.scalatest"        %% "scalatest" % "2.2.6" % "test",
  "org.slf4j"            %  "slf4j-api" % "1.7.23",
- "org.apache.solr"      % "solr-solrj" % "6.4.1" exclude("org.slf4j", "slf4j-api")
+ "org.apache.solr"      %  "solr-solrj" % "6.4.1" exclude("org.slf4j", "slf4j-api"),
+ "org.mockito"          %  "mockito-all" % "1.9.5"
+
 )

@@ -1,3 +1,4 @@
+/*
 package com.knoldus.solrService
 
 
@@ -103,3 +104,4 @@ class SolrServiceSpec extends WordSpec with Matchers with ScalatestRouteTest wit
     }
   }
 }
+*/

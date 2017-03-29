@@ -8,7 +8,9 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import akka.stream.ActorMaterializer
 import com.knoldus.solrService.factories.{BookDetails, SolrAccess}
+import com.typesafe.config.ConfigFactory
 import spray.json.DefaultJsonProtocol
+import org.apache.solr.client.solrj.impl.HttpSolrClient
 
 /**
  * Created by anurag on 22/2/17.
@@ -18,7 +20,17 @@ object BookJsonSupport extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val PortofolioFormats = jsonFormat10(BookDetails)
 }
 
-trait SolrService extends SolrAccess {
+trait SolrService {
+
+  val config = ConfigFactory.load("application.conf")
+  val url = config.getString("solr.url")
+  val collection_name = config.getString("solr.collection")
+  val url_final = url + collection_name
+
+  val solrClientForInsert: HttpSolrClient = new HttpSolrClient.Builder(url).build()
+  val solrClientForExecute: HttpSolrClient = new HttpSolrClient.Builder(url_final).build()
+
+  val solrAccess = new SolrAccess(solrClientForInsert,solrClientForExecute)
 
   import BookJsonSupport._
 
@@ -42,7 +54,7 @@ trait SolrService extends SolrAccess {
         entity(as[BookDetails]) { entity =>
           complete {
             try {
-              val isPersisted: Option[Int] = createOrUpdateRecord(entity)
+              val isPersisted: Option[Int] = solrAccess.createOrUpdateRecord(entity)
               isPersisted match {
                 case Some(data) => HttpResponse(StatusCodes.Created,
                   entity = "Data is successfully persisted")
@@ -62,7 +74,7 @@ trait SolrService extends SolrAccess {
       get {
         complete {
           try {
-            val idAsRDD: Option[List[BookDetails]] = findAllRecord()
+            val idAsRDD: Option[List[BookDetails]] = solrAccess.findAllRecord()
             idAsRDD match {
               case Some(data) =>
                 if(data.size > 0) {
@@ -88,7 +100,7 @@ trait SolrService extends SolrAccess {
       get {
         complete {
           try {
-            val isSearched: Option[List[BookDetails]] = findRecordWithKeyword(keyword)
+            val isSearched: Option[List[BookDetails]] = solrAccess.findRecordWithKeyword(keyword)
             isSearched match {
               case Some(data) =>
                 if (data.size > 0) {
@@ -115,7 +127,7 @@ trait SolrService extends SolrAccess {
       get {
         complete {
           try {
-            val isSearched: Option[List[BookDetails]] = findRecordWithKeyAndValue(key, value)
+            val isSearched: Option[List[BookDetails]] = solrAccess.findRecordWithKeyAndValue(key, value)
             isSearched match {
               case Some(data) =>
                 if(data.size > 0) {
