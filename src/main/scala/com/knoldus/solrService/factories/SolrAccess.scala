@@ -28,7 +28,7 @@ case class BookDetails(
     pages_i: Int)
 
 
-class SolrAccess(solrClientForInsert: HttpSolrClient,solrClientForExecute: HttpSolrClient) {
+trait SolrAccess {
 
   val config = ConfigFactory.load("application.conf")
   val url = config.getString("solr.url")
@@ -45,7 +45,7 @@ class SolrAccess(solrClientForInsert: HttpSolrClient,solrClientForExecute: HttpS
 
   def createOrUpdateRecord(book_Details: BookDetails): Option[Int] = {
     try {
-      //val solrClient = new HttpSolrClient.Builder(url).build()
+      val solrClient = new HttpSolrClient.Builder(url).build()
       val sdoc = new SolrInputDocument()
       sdoc.addField("id", book_Details.id)
       sdoc.addField("cat", book_Details.cat)
@@ -57,9 +57,7 @@ class SolrAccess(solrClientForInsert: HttpSolrClient,solrClientForExecute: HttpS
       sdoc.addField("inStock", book_Details.inStock)
       sdoc.addField("price", book_Details.price)
       sdoc.addField("pages_i", book_Details.pages_i)
-      println("::::::::::::::::::: before calling the function")
-      val result: UpdateResponse = solrClientForInsert.add(collection_name, sdoc)
-      println("::::::::::::::::::::::::::: result in updated Response " + result)
+      val result: UpdateResponse = solrClient.add(collection_name, sdoc)
       Some(result.getStatus)
     } catch {
       case solrServerException: SolrServerException =>
@@ -150,15 +148,14 @@ class SolrAccess(solrClientForInsert: HttpSolrClient,solrClientForExecute: HttpS
 
   private def executeQuery(parameter: SolrQuery): Option[List[BookDetails]] = {
     try {
-      //val solrClient: HttpSolrClient = new HttpSolrClient.Builder(url_final).build()
-      //val solrClient = new HttpSolrClient.Builder(url).build()
-      solrClientForExecute.setParser(new XMLResponseParser())
+      val solrClient: HttpSolrClient = new HttpSolrClient.Builder(url_final).build()
+      solrClient.setParser(new XMLResponseParser())
       val gson = new Gson()
-      val response: QueryResponse = solrClientForExecute.query(parameter)
+      val response: QueryResponse = solrClient.query(parameter)
       implicit val formats = DefaultFormats
       val data: List[BookDetails] = parse(gson.toJson(response.getResults))
         .extract[List[BookDetails]]
-      solrClientForExecute.close()
+      solrClient.close()
       Some(data)
     } catch {
       case solrServerException: SolrServerException =>
@@ -169,4 +166,4 @@ class SolrAccess(solrClientForInsert: HttpSolrClient,solrClientForExecute: HttpS
   }
 }
 
-//object SolrAccess extends SolrAccess
+object SolrAccess extends SolrAccess
