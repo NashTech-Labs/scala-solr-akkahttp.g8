@@ -81,6 +81,32 @@ class SolrRouteSpec extends WordSpec with Matchers with ScalatestRouteTest with 
           response.contains(s"Find books for $keyword and name is :") shouldEqual true
         }
     }
+
+    "be able to search record according to key and value" in {
+      val key = "genre_s"
+      val value = "fantasy"
+      when(solrJsonFormatter.formatBookDetails(json_data)).thenReturn(bookDetails)
+      when(solrAccess.findRecordWithKeyAndValue(key, value)).thenReturn(Some(List(bookDetails)))
+      Get(s"/searchVia/key/$key/value/$value") ~>
+        solrService.solrRoutes ~>
+        check {
+          val response = responseAs[String]
+          response.contains(s"Find books for key : $key & value : $value and name is") shouldEqual true
+        }
+    }
+
+    "not be able to search record according to key and value" in {
+      val key = "genre_s"
+      val value = "horror"
+      when(solrJsonFormatter.formatBookDetails(json_data)).thenReturn(bookDetails)
+      when(solrAccess.findRecordWithKeyAndValue(key, value)).thenReturn(Some(List(bookDetails)))
+      Get(s"/searchVia/key/$key/value/$value") ~>
+        solrService.solrRoutes ~>
+        check {
+          val response = responseAs[String]
+          response.contains(s"Find books for key : $key & value : $value and name is :") shouldEqual true
+        }
+    }
   }
 
 }
