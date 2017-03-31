@@ -102,6 +102,11 @@
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.json4s</groupId>
+      <artifactId>json4s-jackson_${scala.compat.version}</artifactId>
+      <version>${json4s.version}</version>
+    </dependency>
 
     <!-- Dependencies for the Test -->
     <dependency>

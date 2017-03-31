@@ -8,13 +8,18 @@ import com.knoldus.solrService.factories.{BookDetails, SolrAccess}
 import com.typesafe.config.ConfigFactory
 import spray.json.DefaultJsonProtocol
 
-object BookJsonSupport extends DefaultJsonProtocol with SprayJsonSupport {
-  implicit val PortofolioFormats = jsonFormat10(BookDetails)
+//import com.knoldus.solrService.routes.BookJsonSupport._
+
+
+class SolrJsonFormatter {
+  import org.json4s._
+  import org.json4s.jackson.JsonMethods._
+
+  def formatBookDetails(bookDetails: String): BookDetails =
+    parse(bookDetails).asInstanceOf[BookDetails]
 }
 
-import com.knoldus.solrService.routes.BookJsonSupport._
-
-class SolrService(SolrAccess: SolrAccess) {
+class SolrService(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonFormatter) {
 
   val config = ConfigFactory.load("application.conf")
 
@@ -31,10 +36,11 @@ class SolrService(SolrAccess: SolrAccess) {
   val solrRoutes = {
     post {
       path("insert") {
-        entity(as[BookDetails]) { entity =>
+        entity(as[String]) { bookDetailsStr =>
+          val bookDetails = solrJsonFormatter.formatBookDetails(bookDetailsStr)
           complete {
             try {
-              val isPersisted: Option[Int] = SolrAccess.createOrUpdateRecord(entity)
+              val isPersisted: Option[Int] = solrAccess.createOrUpdateRecord(bookDetails)
               isPersisted match {
                 case Some(data) => HttpResponse(StatusCodes.Created,
                   entity = "Data is successfully persisted")
@@ -54,7 +60,7 @@ class SolrService(SolrAccess: SolrAccess) {
       get {
         complete {
           try {
-            val idAsRDD: Option[List[BookDetails]] = SolrAccess.findAllRecord
+            val idAsRDD: Option[List[BookDetails]] = solrAccess.findAllRecord
             idAsRDD match {
               case Some(data) =>
                 if (data.nonEmpty) {
@@ -80,7 +86,7 @@ class SolrService(SolrAccess: SolrAccess) {
       get {
         complete {
           try {
-            val isSearched: Option[List[BookDetails]] = SolrAccess.findRecordWithKeyword(keyword)
+            val isSearched: Option[List[BookDetails]] = solrAccess.findRecordWithKeyword(keyword)
             isSearched match {
               case Some(data) =>
                 if (data.nonEmpty) {
@@ -106,7 +112,7 @@ class SolrService(SolrAccess: SolrAccess) {
       get {
         complete {
           try {
-            val isSearched: Option[List[BookDetails]] = SolrAccess
+            val isSearched: Option[List[BookDetails]] = solrAccess
               .findRecordWithKeyAndValue(key, value)
             isSearched match {
               case Some(data) =>
