@@ -1,3 +1,4 @@
+/*
 package com.knoldus.solrService
 
 import java.io.File
@@ -21,3 +22,4 @@ class SolrAccessSpec extends FunSuite with MockitoSugar with BeforeAndAfterAll {
     server.close()
   }
 }
+*/

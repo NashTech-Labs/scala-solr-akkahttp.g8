@@ -1,4 +1,3 @@
-/*
 package com.knoldus.solrService
 
 
@@ -8,10 +7,14 @@ import com.knoldus.solrService.routes.SolrService
 import org.scalatest.{Matchers, Sequential, WordSpec}
 import akka.http.scaladsl.model.ContentType._
 import akka.http.scaladsl.model.MediaTypes._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
 /**
  * Created by anurag on 22/2/17.
  */
+
+@RunWith(classOf[JUnitRunner])
 class SolrServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with SolrService {
 
   Sequential
@@ -44,7 +47,6 @@ class SolrServiceSpec extends WordSpec with Matchers with ScalatestRouteTest wit
 
       //In this method we will update the data which we insert earlier because we are keeping
       // 'id' same then it will update data
-
       val json_data =
         """{
           |"id" :"124569-0000-363",
@@ -104,4 +106,3 @@ class SolrServiceSpec extends WordSpec with Matchers with ScalatestRouteTest wit
     }
   }
 }
-*/
