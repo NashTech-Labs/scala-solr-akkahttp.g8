@@ -19,15 +19,14 @@ After Downloading Solr use these commands which will create collection and index
 
 There are two ways to test this project :
   
-         activator test
-         
-         sbt test
+         mvn clean compile test
+  
 
 There are two ways to run this project :
   
-         activator run
+         mvn install
          
-         sbt run
+         mvn package exec:java -Dexec.mainClass=com.knoldus.solrService.StartApp
 
 After running this, you can hit its endpoint for performing the operation. eg: 
     
