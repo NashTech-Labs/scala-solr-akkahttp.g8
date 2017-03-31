@@ -3,7 +3,7 @@ package com.knoldus.solrService
 
 import akka.http.scaladsl.model.HttpEntity
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.knoldus.solrService.routes.SolrService
+import com.knoldus.solrService.routes.{SolrJsonFormatter, SolrService}
 import org.scalatest.{Matchers, Sequential, WordSpec}
 import akka.http.scaladsl.model.ContentType._
 import akka.http.scaladsl.model.MediaTypes._
@@ -16,7 +16,8 @@ class SolrServiceSpec extends WordSpec with Matchers with ScalatestRouteTest {
 
   val solrAccessClient = new SolrClientAccess
   val solrAccess = new SolrAccess(solrAccessClient)
-  val solrService = new SolrService(solrAccess)
+  val solrJsonFormatter = new SolrJsonFormatter()
+  val solrService = new SolrService(solrAccess, solrJsonFormatter)
 
   Sequential
 

@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.knoldus.solrService.factories.{SolrAccess, SolrClientAccess}
-import com.knoldus.solrService.routes.SolrService
+import com.knoldus.solrService.routes.{SolrJsonFormatter, SolrService}
 import com.typesafe.config.ConfigFactory
 
 object StartApp extends App {
@@ -13,7 +13,8 @@ object StartApp extends App {
   implicit val materializer = ActorMaterializer()
   val solrAccessClient = new SolrClientAccess
   val solrAccess = new SolrAccess(solrAccessClient)
-  val solrService = new SolrService(solrAccess)
+  val solrJsonFormatter = new SolrJsonFormatter()
+  val solrService = new SolrService(solrAccess, solrJsonFormatter)
   val config = ConfigFactory.load("application.conf")
   val serverUrl = config.getString("http.interface")
   val port = config.getInt("http.port")
