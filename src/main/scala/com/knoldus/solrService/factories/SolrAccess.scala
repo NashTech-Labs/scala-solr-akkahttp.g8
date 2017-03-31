@@ -9,12 +9,6 @@ import org.apache.solr.common.SolrInputDocument
 import org.json4s._
 import org.json4s.native.JsonMethods._
 
-
-/**
- * Created by anurag on 22/2/17.
- */
-
-
 case class BookDetails(
     id: String,
     cat: Array[String],
@@ -27,14 +21,29 @@ case class BookDetails(
     price: Double,
     pages_i: Int)
 
-trait SolrClientAccess {
+class SolrClientAccess {
+
   val config = ConfigFactory.load("application.conf")
   val url = config.getString("solr.url")
   val collection_name = config.getString("solr.collection")
-  val url_final = url + collection_name
+
+  val solrClientForInsert: HttpSolrClient = new HttpSolrClient.Builder(url).build()
 
   /**
-   * This method take a parameter of Book_Details and then insert data or update data if that is
+   * This method creates solr connection.
+   *
+   * @return
+   */
+  def getClientConnection(): HttpSolrClient = {
+    val url_final = url + collection_name
+    val solrClient: HttpSolrClient = new HttpSolrClient.Builder(url_final).build()
+    solrClient.setParser(new XMLResponseParser())
+    solrClient
+  }
+
+
+  /**
+   * This method takes a parameter of Book_Details and then insert data or update data if that is
    * present into solr collection. It match unique key and in our case that is id.
    *
    * @param book_Details
@@ -42,19 +51,18 @@ trait SolrClientAccess {
    */
   def insertRecord(book_Details: BookDetails): Option[Int] = {
     try {
-      val solrClientForInsert: HttpSolrClient = new HttpSolrClient.Builder(url).build()
-      val sdoc: SolrInputDocument = new SolrInputDocument()
-      sdoc.addField("id", book_Details.id)
-      sdoc.addField("cat", book_Details.cat)
-      sdoc.addField("name", book_Details.name)
-      sdoc.addField("author", book_Details.author)
-      sdoc.addField("series_t", book_Details.series_t)
-      sdoc.addField("sequence_i", book_Details.sequence_i)
-      sdoc.addField("genre_s", book_Details.genre_s)
-      sdoc.addField("inStock", book_Details.inStock)
-      sdoc.addField("price", book_Details.price)
-      sdoc.addField("pages_i", book_Details.pages_i)
-      val result: UpdateResponse = solrClientForInsert.add(collection_name, sdoc)
+      val solrInputDocument: SolrInputDocument = new SolrInputDocument()
+      solrInputDocument.addField("id", book_Details.id)
+      solrInputDocument.addField("cat", book_Details.cat)
+      solrInputDocument.addField("name", book_Details.name)
+      solrInputDocument.addField("author", book_Details.author)
+      solrInputDocument.addField("series_t", book_Details.series_t)
+      solrInputDocument.addField("sequence_i", book_Details.sequence_i)
+      solrInputDocument.addField("genre_s", book_Details.genre_s)
+      solrInputDocument.addField("inStock", book_Details.inStock)
+      solrInputDocument.addField("price", book_Details.price)
+      solrInputDocument.addField("pages_i", book_Details.pages_i)
+      val result: UpdateResponse = solrClientForInsert.add(collection_name, solrInputDocument)
       Some(result.getStatus)
     } catch {
       case solrServerException: SolrServerException =>
@@ -64,7 +72,7 @@ trait SolrClientAccess {
   }
 
   /**
-   * This is a method which take the value of solrQuery and then execute query with solr
+   * This is a method which takes the value of solrQuery and then execute query with solr
    * client and after execution it parse result into Case Class and create a List[CaseClass].
    *
    * @param keyValue : value for search
@@ -72,14 +80,13 @@ trait SolrClientAccess {
    */
   def fetchData(keyValue: String): Option[List[BookDetails]] = {
     try {
+      val solrClient = getClientConnection()
       val parameter = new SolrQuery()
       parameter.set("qt", "/select")
       parameter.set("indent", "true")
       parameter.set("q", s"$keyValue")
       parameter.set("wt", "json")
-      val solrClient: HttpSolrClient = new HttpSolrClient.Builder(url_final).build()
-      solrClient.setParser(new XMLResponseParser())
-      val gson = new Gson()
+      val gson: Gson = new Gson()
       val response: QueryResponse = solrClient.query(parameter)
       implicit val formats = DefaultFormats
       val data: List[BookDetails] = parse(gson.toJson(response.getResults))
@@ -94,14 +101,10 @@ trait SolrClientAccess {
   }
 }
 
-object SolrClientServerAccess extends SolrClientAccess
-
-trait SolrAccess {
-
-  val solrClientAccess: SolrClientAccess
+class SolrAccess(solrClientAccess: SolrClientAccess) {
 
   /**
-   * This method take a parameter of Book_Details and then insert data or update data if that is
+   * This method takes a parameter of Book_Details and then insert data or update data if that is
    * present into solr collection. It match unique key and in our case that is id.
    *
    * @param book_Details
@@ -162,8 +165,4 @@ trait SolrAccess {
         None
     }
   }
-}
-
-object SolrAccess extends SolrAccess {
-  override val solrClientAccess = SolrClientServerAccess
 }
