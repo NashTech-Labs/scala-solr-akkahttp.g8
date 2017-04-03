@@ -1,107 +1,37 @@
 package com.knoldus.solrService
 
-
-import akka.http.scaladsl.model.HttpEntity
-import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.knoldus.solrService.routes.SolrService
-import org.scalatest.{Matchers, Sequential, WordSpec}
-import akka.http.scaladsl.model.ContentType._
-import akka.http.scaladsl.model.MediaTypes._
-import com.knoldus.solrService.factories.{SolrAccess, SolrClientAccess}
+import com.knoldus.solrService.factories.{BookDetails, SolrAccess, SolrClientAccess}
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer
+import org.apache.solr.core.CoreContainer
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import org.scalatest.mock.MockitoSugar
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Sequential}
 
 @RunWith(classOf[JUnitRunner])
-class SolrServiceSpec extends WordSpec with Matchers with ScalatestRouteTest {
-
-  val solrAccessClient = new SolrClientAccess
-  val solrAccess = new SolrAccess(solrAccessClient)
-  val solrService = new SolrService(solrAccess)
-
+class SolrServiceSpec extends FunSuite with MockitoSugar with BeforeAndAfterAll {
   Sequential
 
-  "The service" should {
+  var server: EmbeddedSolrServer = _
+  var solrAccess: SolrAccess = _
+  val bookDetails = BookDetails("1", Array(), "Solr", "Henry",
+    Some("education"), 2, "education", inStock = true, 1253.1D, 2569)
 
-    "be able to insert data in the solr" in {
-      val json_data =
-        """{
-          |"id" :"124569-0000-363",
-          |"cat" : ["book", "education"],
-          |"name" :"Solr knowledge",
-          |"author" : "Henry/",
-          |"series_t" : "education",
-          |"sequence_i" : 2,
-          |"genre_s" : "education",
-          |"inStock" : true,
-          |"price" : 1253.1,
-          |"pages_i" : 2569
-          |}""".stripMargin
-      Post("/insert", HttpEntity(`application/json`, json_data)) ~>
-      solrService.solrRoutes ~>
-      check {
-        responseAs[String].contains("Data is successfully persisted") shouldEqual true
-      }
-    }
+  override def beforeAll(): Unit = {
+    val container = new CoreContainer()
+    container.load()
 
+    server = new EmbeddedSolrServer(container, "test_embedded")
 
-    "be able to update data in the solr" in {
+    val solrClientAccess = new SolrClientAccess(server)
+    solrAccess = new SolrAccess(solrClientAccess)
+  }
+  override def afterAll(): Unit = {
+    server.close
+  }
 
-      val json_data =
-        """{
-          |"id" :"124569-0000-363",
-          |"cat" : ["book", "education", "solr"],
-          |"name" :"Solr",
-          |"author" : "Henry/",
-          |"series_t" : "education",
-          |"sequence_i" : 2,
-          |"genre_s" : "education",
-          |"inStock" : true,
-          |"price" : 1253.1,
-          |"pages_i" : 2569
-          |}""".stripMargin
-      Post("/insert", HttpEntity(`application/json`, json_data)) ~>
-      solrService.solrRoutes ~>
-      check {
-        responseAs[String].contains("Data is successfully persisted") shouldEqual true
-      }
-    }
-
-    "be able to fetch all data in the solr" in {
-      Get("/getall") ~> solrService.solrRoutes ~> check {
-        responseAs[String].contains("Find List of books when fetch all records :") shouldEqual true
-      }
-    }
-
-    "be able to search data with the help of keyword in the solr" in {
-      val keyword = "fantasy"
-      Get(s"/search/keyword/$keyword") ~> solrService.solrRoutes ~> check {
-        responseAs[String].contains(s"Find books for $keyword and name is :") shouldEqual true
-      }
-    }
-
-    "not be able to search data with the help of keyword in the solr" in {
-      val keyword = "Horror"
-      Get(s"/search/keyword/$keyword") ~> solrService.solrRoutes ~> check {
-        responseAs[String].contains(s"No Book Found books for $keyword") shouldEqual true
-      }
-    }
-
-    "be able to search data with the help of key and value in the solr" in {
-      val key = "genre_s"
-      val value = "fantasy"
-      Get(s"/searchVia/key/$key/value/$value") ~> solrService.solrRoutes ~> check {
-        responseAs[String]
-          .contains(s"Find books for key : $key & value : $value and name is :") shouldEqual true
-      }
-    }
-
-    "not be able to search data with the help of key and value in the solr" in {
-      val key = "genre_s"
-      val value = "Horror"
-      Get(s"/searchVia/key/$key/value/$value") ~> solrService.solrRoutes ~> check {
-        responseAs[String]
-          .contains(s"No Books Found for key : $key & value : $value") shouldEqual true
-      }
-    }
+  test("test insert") {
+    val response = solrAccess.createOrUpdateRecord(bookDetails)
+    assert(response.isDefined)
   }
 }

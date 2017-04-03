@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.typesafe.config.ConfigFactory
 import org.apache.solr.client.solrj.impl.{HttpSolrClient, XMLResponseParser}
 import org.apache.solr.client.solrj.response.{QueryResponse, UpdateResponse}
-import org.apache.solr.client.solrj.{SolrQuery, SolrServerException}
+import org.apache.solr.client.solrj.{SolrClient, SolrQuery, SolrServerException}
 import org.apache.solr.common.SolrInputDocument
 import org.json4s._
 import org.json4s.native.JsonMethods._
@@ -21,13 +21,11 @@ case class BookDetails(
     price: Double,
     pages_i: Int)
 
-class SolrClientAccess {
+class SolrClientAccess(solrClientForInsert: SolrClient) {
 
   val config = ConfigFactory.load("application.conf")
   val url = config.getString("solr.url")
   val collection_name = config.getString("solr.collection")
-
-  val solrClientForInsert: HttpSolrClient = new HttpSolrClient.Builder(url).build()
 
   /**
    * This method creates solr connection.
@@ -66,7 +64,9 @@ class SolrClientAccess {
       Some(result.getStatus)
     } catch {
       case solrServerException: SolrServerException =>
-        println("Solr Server Exception : " + solrServerException.getMessage)
+        println("Solr Server Exception : " + solrServerException.getMessage + " ::: reason : " + solrServerException.getRootCause)
+        println("\n getLocalizedMessage : " + solrServerException.getLocalizedMessage + " :::::::::; getStackTrace : " + solrServerException.getStackTrace)
+        println(" \n print stacktrace : " + solrServerException.printStackTrace())
         None
     }
   }
