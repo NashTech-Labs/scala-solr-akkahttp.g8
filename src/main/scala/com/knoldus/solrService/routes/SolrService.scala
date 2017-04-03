@@ -1,22 +1,23 @@
 package com.knoldus.solrService.routes
 
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.ExceptionHandler
 import com.knoldus.solrService.factories.{BookDetails, SolrAccess}
 import com.typesafe.config.ConfigFactory
-import spray.json.DefaultJsonProtocol
 
 //import com.knoldus.solrService.routes.BookJsonSupport._
 
 
 class SolrJsonFormatter {
+
   import org.json4s._
   import org.json4s.jackson.JsonMethods._
 
-  def formatBookDetails(bookDetails: String): BookDetails =
-    parse(bookDetails).asInstanceOf[BookDetails]
+  def formatBookDetails(bookDetails: String): BookDetails = {
+    implicit val formats = DefaultFormats
+    parse(bookDetails.replaceAll("\n", "").replaceAll("\\s+", " ")).extract[BookDetails]
+  }
 }
 
 class SolrService(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonFormatter) {
@@ -119,7 +120,7 @@ class SolrService(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonFormatter) 
                 if (data.nonEmpty) {
                   val book_name: String = data.map(book_record => book_record.name).mkString(",")
                   println(s"List of books when fetch ecord with key : $key and value : $value : " +
-                          book_name)
+                    book_name)
                   HttpResponse(StatusCodes.OK,
                     entity = s"Find books for key : $key & value : $value and name is : $book_name")
                 } else {

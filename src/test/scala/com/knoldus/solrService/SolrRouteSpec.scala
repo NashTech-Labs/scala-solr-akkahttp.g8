@@ -47,8 +47,29 @@ class SolrRouteSpec extends WordSpec with Matchers with ScalatestRouteTest with 
         }
     }
 
-    "be able to get all record" in {
+    "not be able to insert record when data is None" in {
       when(solrJsonFormatter.formatBookDetails(json_data)).thenReturn(bookDetails)
+      when(solrAccess.createOrUpdateRecord(bookDetails)).thenReturn(None)
+      Post("/insert", HttpEntity(`application/json`, json_data)) ~>
+        solrService.solrRoutes ~>
+        check {
+          val res = responseAs[String]
+          res.contains("Error while persisting data") shouldEqual true
+        }
+    }
+
+    "throw exception for insert record" in {
+      when(solrJsonFormatter.formatBookDetails(json_data)).thenReturn(null.asInstanceOf[BookDetails])
+      when(solrAccess.createOrUpdateRecord(bookDetails)).thenReturn(Some(1))
+      Post("/insert", HttpEntity(`application/json`, json_data)) ~>
+        solrService.solrRoutes ~>
+        check {
+          val res = responseAs[String]
+          res.contains("Error while persisting data") shouldEqual true
+        }
+    }
+
+    "be able to get all record" in {
       when(solrAccess.findAllRecord).thenReturn(Some(List(bookDetails)))
       Get("/getall") ~>
         solrService.solrRoutes ~>
@@ -58,9 +79,38 @@ class SolrRouteSpec extends WordSpec with Matchers with ScalatestRouteTest with 
         }
     }
 
+    "not be able to get all record" in {
+      when(solrAccess.findAllRecord).thenReturn(Some(List()))
+      Get("/getall") ~>
+        solrService.solrRoutes ~>
+        check {
+          val response = responseAs[String]
+          response.contains("No Book Found") shouldEqual true
+        }
+    }
+
+    "not be able to get record when data is None" in {
+      when(solrAccess.findAllRecord).thenReturn(None)
+      Get("/getall") ~>
+        solrService.solrRoutes ~>
+        check {
+          val response = responseAs[String]
+          response.contains("Data is not fetched and something went wrong") shouldEqual true
+        }
+    }
+
+    "throw an exception while trying to get all record" in {
+      when(solrAccess.findAllRecord).thenReturn(null.asInstanceOf[Option[List[BookDetails]]])
+      Get("/getall") ~>
+        solrService.solrRoutes ~>
+        check {
+          val response = responseAs[String]
+          response.contains("Error found for data") shouldEqual true
+        }
+    }
+
     "be able to search record with a keyword" in {
       val keyword = "fantasy"
-      when(solrJsonFormatter.formatBookDetails(json_data)).thenReturn(bookDetails)
       when(solrAccess.findRecordWithKeyword(keyword)).thenReturn(Some(List(bookDetails)))
       Get(s"/search/keyword/$keyword") ~>
         solrService.solrRoutes ~>
@@ -71,40 +121,84 @@ class SolrRouteSpec extends WordSpec with Matchers with ScalatestRouteTest with 
     }
 
     "not be able to search record with a keyword" in {
-      val keyword = "horror"
-      when(solrJsonFormatter.formatBookDetails(json_data)).thenReturn(bookDetails)
-      when(solrAccess.findRecordWithKeyword(keyword)).thenReturn(Some(List(bookDetails)))
+      val keyword = "fantasy"
+      when(solrAccess.findRecordWithKeyword(keyword)).thenReturn(Some(List()))
       Get(s"/search/keyword/$keyword") ~>
         solrService.solrRoutes ~>
         check {
           val response = responseAs[String]
-          response.contains(s"Find books for $keyword and name is :") shouldEqual true
+          response.contains(s"No Book Found books for $keyword") shouldEqual true
+        }
+    }
+
+    "not be able to search record with a keyword when data is None" in {
+      val keyword = "fantasy"
+      when(solrAccess.findRecordWithKeyword(keyword)).thenReturn(None)
+      Get(s"/search/keyword/$keyword") ~>
+        solrService.solrRoutes ~>
+        check {
+          val response = responseAs[String]
+          response.contains(s"Error found data for keyword : $keyword") shouldEqual true
+        }
+    }
+
+    "throw exception while trying to search record with a keyword" in {
+      val keyword = "fantasy"
+      when(solrAccess.findRecordWithKeyword(keyword)).thenReturn(null.asInstanceOf[Option[List[BookDetails]]])
+      Get(s"/search/keyword/$keyword") ~>
+        solrService.solrRoutes ~>
+        check {
+          val response = responseAs[String]
+          response.contains(s"Error found for keyword : $keyword") shouldEqual true
         }
     }
 
     "be able to search record according to key and value" in {
       val key = "genre_s"
       val value = "fantasy"
-      when(solrJsonFormatter.formatBookDetails(json_data)).thenReturn(bookDetails)
       when(solrAccess.findRecordWithKeyAndValue(key, value)).thenReturn(Some(List(bookDetails)))
       Get(s"/searchVia/key/$key/value/$value") ~>
         solrService.solrRoutes ~>
         check {
           val response = responseAs[String]
-          response.contains(s"Find books for key : $key & value : $value and name is") shouldEqual true
+          response.contains(s"Find books for key : $key & value : $value and name is : ") shouldEqual true
         }
     }
 
     "not be able to search record according to key and value" in {
       val key = "genre_s"
-      val value = "horror"
-      when(solrJsonFormatter.formatBookDetails(json_data)).thenReturn(bookDetails)
-      when(solrAccess.findRecordWithKeyAndValue(key, value)).thenReturn(Some(List(bookDetails)))
+      val value = "fantasy"
+      when(solrAccess.findRecordWithKeyAndValue(key, value)).thenReturn(Some(List()))
       Get(s"/searchVia/key/$key/value/$value") ~>
         solrService.solrRoutes ~>
         check {
           val response = responseAs[String]
-          response.contains(s"Find books for key : $key & value : $value and name is :") shouldEqual true
+          response.contains(s"No Books Found for key : $key & value : $value") shouldEqual true
+        }
+    }
+
+    "not be able to search record according to key and value when data is None" in {
+      val key = "genre_s"
+      val value = "fantasy"
+      when(solrAccess.findRecordWithKeyAndValue(key, value)).thenReturn(None)
+      Get(s"/searchVia/key/$key/value/$value") ~>
+        solrService.solrRoutes ~>
+        check {
+          val response = responseAs[String]
+          response.contains(s"Error found data for key : $key & value : $value") shouldEqual true
+        }
+    }
+
+    "throw an exception while trying to search record according to key and value" in {
+      val key = "genre_s"
+      val value = "fantasy"
+      when(solrAccess.findRecordWithKeyAndValue(key, value))
+        .thenReturn(null.asInstanceOf[Option[List[BookDetails]]])
+      Get(s"/searchVia/key/$key/value/$value") ~>
+        solrService.solrRoutes ~>
+        check {
+          val response = responseAs[String]
+          response.contains(s"Error found for data for key : $key & value : $value") shouldEqual true
         }
     }
   }
