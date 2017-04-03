@@ -3,7 +3,7 @@ package com.knoldus.solrService.routes
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.ExceptionHandler
+import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import com.knoldus.solrService.factories.{BookDetails, SolrAccess}
 import com.typesafe.config.ConfigFactory
 import spray.json.DefaultJsonProtocol
