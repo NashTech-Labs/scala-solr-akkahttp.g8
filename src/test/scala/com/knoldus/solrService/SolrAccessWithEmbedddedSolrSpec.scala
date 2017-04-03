@@ -9,7 +9,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Sequential}
 
 @RunWith(classOf[JUnitRunner])
-class SolrServiceSpec extends FunSuite with MockitoSugar with BeforeAndAfterAll {
+class SolrAccessWithEmbedddedSolrSpec extends FunSuite with MockitoSugar with BeforeAndAfterAll {
   Sequential
 
   var server: EmbeddedSolrServer = _
