@@ -16,25 +16,25 @@ class SolrAccessSpec extends FunSuite with MockitoSugar {
 
   test("to create or update record if already created") {
     when(solrAccessClient.insertRecord(book)).thenReturn(Some(1))
-    val result: Option[Int] = solrAccess.createOrUpdateRecord(book)
+    val result = solrAccess.createOrUpdateRecord(book)
     assert(result.contains(1))
   }
 
   test("to  find all record") {
     when(solrAccessClient.fetchData("*:*")).thenReturn(Some(List(book)))
-    val result: Option[List[BookDetails]] = solrAccess.findAllRecord
+    val result = solrAccess.findAllRecord
     assert(result.contains(List(book)))
   }
 
   test("to  find record with keyword") {
     when(solrAccessClient.fetchData("reference")).thenReturn(Some(List(book)))
-    val result: Option[List[BookDetails]] = solrAccess.findRecordWithKeyword("reference")
+    val result = solrAccess.findRecordWithKeyword("reference")
     assert(result.contains(List(book)))
   }
 
   test("to  find record with key and value") {
     when(solrAccessClient.fetchData("id:12")).thenReturn(Some(List(book)))
-    val result: Option[List[BookDetails]] = solrAccess.findRecordWithKeyAndValue("id", "12")
+    val result = solrAccess.findRecordWithKeyAndValue("id", "12")
     assert(result.contains(List(book)))
   }
 
