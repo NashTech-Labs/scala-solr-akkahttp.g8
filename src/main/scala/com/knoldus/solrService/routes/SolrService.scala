@@ -49,7 +49,7 @@ class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonF
               }
             } catch {
               case ex: Throwable =>
-                println(ex, ex.getMessage)
+                println("Error: " + ex, ex.getMessage)
                 HttpResponse(StatusCodes.InternalServerError,
                   entity = "Error while persisting data")
             }
@@ -76,7 +76,7 @@ class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonF
             }
           } catch {
             case ex: Throwable =>
-              println(ex, ex.getMessage)
+              println("Error: " + ex, ex.getMessage)
               HttpResponse(StatusCodes.InternalServerError,
                 entity = s"Error found for data")
           }
@@ -102,7 +102,7 @@ class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonF
             }
           } catch {
             case ex: Throwable =>
-              println(ex, ex.getMessage)
+              println("Error: " + ex, ex.getMessage)
               HttpResponse(StatusCodes.InternalServerError,
                 entity = s"Error found for keyword : $keyword")
           }
@@ -131,7 +131,7 @@ class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonF
             }
           } catch {
             case ex: Throwable =>
-              println(ex, ex.getMessage)
+              println("Error: " + ex, ex.getMessage)
               HttpResponse(StatusCodes.InternalServerError,
                 entity = s"Error found for data for key : $key & value : $value")
           }
