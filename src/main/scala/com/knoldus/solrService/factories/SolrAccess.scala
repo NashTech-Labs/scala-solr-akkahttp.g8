@@ -1,6 +1,7 @@
 package com.knoldus.solrService.factories
 
 import com.google.gson.Gson
+import com.google.inject.Inject
 import com.typesafe.config.ConfigFactory
 import org.apache.solr.client.solrj.impl.{HttpSolrClient, XMLResponseParser}
 import org.apache.solr.client.solrj.response.{QueryResponse, UpdateResponse}
@@ -21,7 +22,7 @@ case class BookDetails(
                         price: Double,
                         pages_i: Int)
 
-class SolrClientAccess(solrClientForInsert: SolrClient) {
+class SolrClientAccess @Inject()(solrClientForInsert: SolrClient) {
 
   val config = ConfigFactory.load("application.conf")
   val url = config.getString("solr.url")
@@ -98,7 +99,7 @@ class SolrClientAccess(solrClientForInsert: SolrClient) {
   }
 }
 
-class SolrAccess(solrClientAccess: SolrClientAccess) {
+class SolrAccess @Inject()(solrClientAccess: SolrClientAccess) {
 
   /**
     * This method takes a parameter of Book_Details and then insert data or update data if that is

@@ -41,5 +41,6 @@ src_managed/
 project/boot/
 .history
 .cache
+solr/test_embedded/data
 
 # Created by .ignore support plugin (hsz.mobi)
