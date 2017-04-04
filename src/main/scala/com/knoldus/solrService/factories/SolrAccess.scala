@@ -22,6 +22,10 @@ case class BookDetails(
                         price: Double,
                         pages_i: Int)
 
+/**
+  * We are using Google Juice to inject object of different class
+  * @param solrClientForInsert
+  */
 class SolrClientAccess @Inject()(solrClientForInsert: SolrClient) {
 
   val config = ConfigFactory.load("application.conf")
