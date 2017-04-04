@@ -8,7 +8,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class SolrAccessUnitTestSpec extends FunSuite with MockitoSugar {
+class SolrAccessSpec extends FunSuite with MockitoSugar {
 
   private val solrAccessClient = mock[SolrClientAccess]
   private val solrAccess = new SolrAccess(solrAccessClient)
