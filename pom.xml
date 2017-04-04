@@ -55,12 +55,12 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
       <version>${solr.version}</version>
-      <exclusions>
+      <!--<exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
         </exclusion>
-      </exclusions>
+      </exclusions>-->
     </dependency>
     <dependency>
       <groupId>com.typesafe</groupId>
@@ -114,6 +114,17 @@
       <version>3.5.0</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.typesafe.scala-logging</groupId>
+      <artifactId>scala-logging_2.11</artifactId>
+      <version>3.4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.1</version>
+    </dependency>
 
     <!-- Dependencies for the Test -->
     <dependency>
@@ -195,6 +206,31 @@
           </includes>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.scalastyle</groupId>
+        <artifactId>scalastyle-maven-plugin</artifactId>
+        <version>0.8.0</version>
+        <configuration>
+          <failOnViolation>true</failOnViolation>
+          <failOnWarning>false</failOnWarning>
+          <verbose>false</verbose>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <sourceDirectory>${basedir}/src/main/scala</sourceDirectory>
+          <configLocation>${basedir}/src/main/resources/scalastyle_config.xml</configLocation>
+          <outputFile>${project.basedir}/target/scalastyle-output.xml</outputFile>
+          <outputEncoding>UTF-8</outputEncoding>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
+
   </build>
 </project>
