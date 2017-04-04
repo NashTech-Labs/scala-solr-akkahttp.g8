@@ -33,6 +33,7 @@ class SolrClientAccess @Inject()(solrClientForInsert: SolrClient) {
   val config = ConfigFactory.load("application.conf")
   val url = config.getString("solr.url")
   val collection_name = config.getString("solr.collection")
+
   val logger = Logger(classOf[SolrAccess])
 
   /**
@@ -79,8 +80,10 @@ class SolrClientAccess @Inject()(solrClientForInsert: SolrClient) {
       parameter.set("indent", "true")
       parameter.set("q", s"$keyValue")
       parameter.set("wt", "json")
+
       val gson: Gson = new Gson()
-      val response: QueryResponse = solrClient.query(parameter)
+      val response: QueryResponse = solrClientForInsert.query(collection_name,parameter)
+
       implicit val formats = DefaultFormats
       val data: List[BookDetails] = parse(gson.toJson(response.getResults))
         .extract[List[BookDetails]]
