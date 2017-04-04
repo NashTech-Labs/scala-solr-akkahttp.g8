@@ -18,7 +18,6 @@ object StartApp extends App {
   val url = config.getString("solr.url")
   val serverUrl = config.getString("http.interface")
   val port = config.getInt("http.port")
-
   val solrClient = new HttpSolrClient.Builder(url).build()
   val solrAccessClient = new SolrClientAccess(solrClient)
   val solrAccess = new SolrAccess(solrAccessClient)

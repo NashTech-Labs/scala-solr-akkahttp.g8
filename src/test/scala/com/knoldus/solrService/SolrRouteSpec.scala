@@ -1,7 +1,7 @@
 package com.knoldus.solrService
 
+import akka.http.scaladsl.model.HttpEntity
 import akka.http.scaladsl.model.MediaTypes._
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import com.knoldus.solrService.factories.{BookDetails, SolrAccess}
 import com.knoldus.solrService.routes.{SolrJsonFormatter, SolrService}
