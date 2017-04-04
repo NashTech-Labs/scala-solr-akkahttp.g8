@@ -1,17 +1,16 @@
 package com.knoldus.solrService.routes
 
-import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import akka.http.scaladsl.server.ExceptionHandler
 import com.google.inject.Inject
 import com.knoldus.solrService.factories.{BookDetails, SolrAccess}
 import com.typesafe.config.ConfigFactory
+import com.typesafe.scalalogging.Logger
+import org.json4s.DefaultFormats
+import org.json4s.jackson.JsonMethods.parse
 
 class SolrJsonFormatter {
-
-  import org.json4s._
-  import org.json4s.jackson.JsonMethods._
 
   def formatBookDetails(bookDetails: String): BookDetails = {
     implicit val formats = DefaultFormats
@@ -21,9 +20,10 @@ class SolrJsonFormatter {
 
 class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonFormatter) {
 
+  val logger = Logger(classOf[SolrService])
   val config = ConfigFactory.load("application.conf")
 
-  implicit def myExceptionHandler = {
+  implicit def myExceptionHandler: ExceptionHandler = {
     ExceptionHandler {
       case e: ArithmeticException =>
         extractUri { uri =>
@@ -49,7 +49,7 @@ class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonF
               }
             } catch {
               case ex: Throwable =>
-                println("Error: " + ex, ex.getMessage)
+                logger.error(ex.getMessage)
                 HttpResponse(StatusCodes.InternalServerError,
                   entity = "Error while persisting data")
             }
@@ -65,7 +65,7 @@ class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonF
               case Some(data) =>
                 if (data.nonEmpty) {
                   val book_name: String = data.map(book_record => book_record.name).mkString(",")
-                  println("List of books when fetch all records : " + book_name)
+                  logger.info("List of books when fetch all records : " + book_name)
                   HttpResponse(StatusCodes.OK,
                     entity = s"Find List of books when fetch all records : $book_name")
                 } else {
@@ -76,7 +76,7 @@ class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonF
             }
           } catch {
             case ex: Throwable =>
-              println("Error: " + ex, ex.getMessage)
+              logger.error(ex.getMessage)
               HttpResponse(StatusCodes.InternalServerError,
                 entity = s"Error found for data")
           }
@@ -91,7 +91,7 @@ class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonF
               case Some(data) =>
                 if (data.nonEmpty) {
                   val book_name: String = data.map(book_record => book_record.name).mkString(",")
-                  println(s"List of books when fetch record with keyword: $keyword: " + book_name)
+                  logger.info(s"List of books when fetch record with keyword: $keyword: " + book_name)
                   HttpResponse(StatusCodes.OK,
                     entity = s"Find books for $keyword and name is : $book_name")
                 } else {
@@ -102,7 +102,7 @@ class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonF
             }
           } catch {
             case ex: Throwable =>
-              println("Error: " + ex, ex.getMessage)
+              logger.error(ex.getMessage)
               HttpResponse(StatusCodes.InternalServerError,
                 entity = s"Error found for keyword : $keyword")
           }
@@ -118,8 +118,9 @@ class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonF
               case Some(data) =>
                 if (data.nonEmpty) {
                   val book_name: String = data.map(book_record => book_record.name).mkString(",")
-                  println(s"List of books when fetch ecord with key : $key and value : $value : " +
-                    book_name)
+                  logger
+                    .info(s"List of books when fetch ecord with key : $key and value : $value : " +
+                          book_name)
                   HttpResponse(StatusCodes.OK,
                     entity = s"Find books for key : $key & value : $value and name is : $book_name")
                 } else {
@@ -131,7 +132,7 @@ class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonF
             }
           } catch {
             case ex: Throwable =>
-              println("Error: " + ex, ex.getMessage)
+              logger.error(ex.getMessage)
               HttpResponse(StatusCodes.InternalServerError,
                 entity = s"Error found for data for key : $key & value : $value")
           }
