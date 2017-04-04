@@ -51,9 +51,7 @@ class SolrClientAccess(solrClientForInsert: SolrClient) {
       Some(result.getStatus)
     } catch {
       case solrServerException: SolrServerException =>
-        println("Solr Server Exception : " + solrServerException.getMessage + " ::: reason : " + solrServerException.getRootCause)
-        println("\n getLocalizedMessage : " + solrServerException.getLocalizedMessage + " :::::::::; getStackTrace : " + solrServerException.getStackTrace)
-        println(" \n print stacktrace : " + solrServerException.printStackTrace())
+        println("Solr Server Exception : " + solrServerException.getMessage)
         None
     }
   }
@@ -122,10 +120,10 @@ class SolrAccess(solrClientAccess: SolrClientAccess) {
 
   def findAllRecord: Option[List[BookDetails]] = {
 
-      solrClientAccess.fetchData("*:*") match {
-        case Some(data) => Some(data)
-        case None => None
-      }
+    solrClientAccess.fetchData("*:*") match {
+      case Some(data) => Some(data)
+      case None => None
+    }
   }
 
   /**
@@ -150,7 +148,7 @@ class SolrAccess(solrClientAccess: SolrClientAccess) {
     */
 
   def findRecordWithKeyAndValue(key: String, value: String): Option[List[BookDetails]] = {
-      val keyValue = s"$key:" + s"${value.trim}"
-      solrClientAccess.fetchData(keyValue)
+    val keyValue = s"$key:" + s"${value.trim}"
+    solrClientAccess.fetchData(keyValue)
   }
 }
