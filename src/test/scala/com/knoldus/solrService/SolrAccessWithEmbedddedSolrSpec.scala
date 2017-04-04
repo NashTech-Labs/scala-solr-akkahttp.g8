@@ -22,7 +22,7 @@ class SolrAccessWithEmbedddedSolrSpec extends FunSuite with MockitoSugar with Be
     container.load()
 
     server = new EmbeddedSolrServer(container, "test_embedded")
-    val solrClientAccess = new SolrClientAccess(server)
+    val solrClientAccess = new SolrClientAccess(server,None)
     solrAccess = new SolrAccess(solrClientAccess)
 
     server.deleteByQuery("*:*")

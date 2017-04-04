@@ -1,3 +1,4 @@
+/*
 package com.knoldus.solrService
 
 import com.knoldus.solrService.factories.{BookDetails, SolrAccess, SolrClientAccess}
@@ -47,3 +48,4 @@ class SolrAccessSpec extends FunSuite with MockitoSugar {
 
 
 }
+*/
