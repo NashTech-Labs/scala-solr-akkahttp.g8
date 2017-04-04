@@ -11,16 +11,16 @@ import org.json4s._
 import org.json4s.native.JsonMethods._
 
 case class BookDetails(
-                        id: String,
-                        cat: Array[String],
-                        name: String,
-                        author: String,
-                        series_t: Option[String],
-                        sequence_i: Int,
-                        genre_s: String,
-                        inStock: Boolean,
-                        price: Double,
-                        pages_i: Int)
+    id: String,
+    cat: Array[String],
+    name: String,
+    author: String,
+    series_t: Option[String],
+    sequence_i: Int,
+    genre_s: String,
+    inStock: Boolean,
+    price: Double,
+    pages_i: Int)
 
 /**
   * We are using Google Juice to inject object of different class
