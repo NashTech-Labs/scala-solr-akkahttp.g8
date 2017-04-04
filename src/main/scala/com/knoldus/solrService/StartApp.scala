@@ -12,8 +12,8 @@ object StartApp extends App {
   implicit val system = ActorSystem("Solr-Akka-Service")
   implicit val executor = system.dispatcher
   implicit val materializer = ActorMaterializer()
-  val solrJsonFormatter = new SolrJsonFormatter()
 
+  val solrJsonFormatter = new SolrJsonFormatter()
   val config = ConfigFactory.load("application.conf")
   val url = config.getString("solr.url")
   val serverUrl = config.getString("http.interface")
@@ -22,5 +22,6 @@ object StartApp extends App {
   val solrAccessClient = new SolrClientAccess(solrClient)
   val solrAccess = new SolrAccess(solrAccessClient)
   val solrService = new SolrService(solrAccess, solrJsonFormatter)
+
   Http().bindAndHandle(solrService.solrRoutes, serverUrl, port)
 }

@@ -6,9 +6,6 @@ import akka.http.scaladsl.server.ExceptionHandler
 import com.knoldus.solrService.factories.{BookDetails, SolrAccess}
 import com.typesafe.config.ConfigFactory
 
-//import com.knoldus.solrService.routes.BookJsonSupport._
-
-
 class SolrJsonFormatter {
 
   import org.json4s._
