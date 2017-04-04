@@ -3,6 +3,7 @@ package com.knoldus.solrService.routes
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.ExceptionHandler
+import com.google.inject.Inject
 import com.knoldus.solrService.factories.{BookDetails, SolrAccess}
 import com.typesafe.config.ConfigFactory
 
@@ -17,7 +18,7 @@ class SolrJsonFormatter {
   }
 }
 
-class SolrService(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonFormatter) {
+class SolrService @Inject()(solrAccess: SolrAccess, solrJsonFormatter: SolrJsonFormatter) {
 
   val config = ConfigFactory.load("application.conf")
 
