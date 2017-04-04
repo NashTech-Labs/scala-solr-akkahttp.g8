@@ -11,16 +11,16 @@ import org.json4s._
 import org.json4s.native.JsonMethods._
 
 case class BookDetails(
-    id: String,
-    cat: Array[String],
-    name: String,
-    author: String,
-    series_t: Option[String],
-    sequence_i: Int,
-    genre_s: String,
-    inStock: Boolean,
-    price: Double,
-    pages_i: Int)
+                        id: String,
+                        cat: Array[String],
+                        name: String,
+                        author: String,
+                        series_t: Option[String],
+                        sequence_i: Int,
+                        genre_s: String,
+                        inStock: Boolean,
+                        price: Double,
+                        pages_i: Int)
 
 class SolrClientAccess @Inject()(solrClientForInsert: SolrClient) {
 
@@ -29,25 +29,12 @@ class SolrClientAccess @Inject()(solrClientForInsert: SolrClient) {
   val collection_name = config.getString("solr.collection")
 
   /**
-   * This method creates solr connection.
-   *
-   * @return
-   */
-  def getClientConnection(): HttpSolrClient = {
-    val url_final = url + collection_name
-    val solrClient: HttpSolrClient = new HttpSolrClient.Builder(url_final).build()
-    solrClient.setParser(new XMLResponseParser())
-    solrClient
-  }
-
-
-  /**
-   * This method takes a parameter of Book_Details and then insert data or update data if that is
-   * present into solr collection. It match unique key and in our case that is id.
-   *
-   * @param book_Details
-   * @return
-   */
+    * This method takes a parameter of Book_Details and then insert data or update data if that is
+    * present into solr collection. It match unique key and in our case that is id.
+    *
+    * @param book_Details
+    * @return
+    */
   def insertRecord(book_Details: BookDetails): Option[Int] = {
     try {
       val solrInputDocument: SolrInputDocument = new SolrInputDocument()
@@ -65,20 +52,18 @@ class SolrClientAccess @Inject()(solrClientForInsert: SolrClient) {
       Some(result.getStatus)
     } catch {
       case solrServerException: SolrServerException =>
-        println("Solr Server Exception : " + solrServerException.getMessage + " ::: reason : " + solrServerException.getRootCause)
-        println("\n getLocalizedMessage : " + solrServerException.getLocalizedMessage + " :::::::::; getStackTrace : " + solrServerException.getStackTrace)
-        println(" \n print stacktrace : " + solrServerException.printStackTrace())
+        println("Solr Server Exception : " + solrServerException.getMessage)
         None
     }
   }
 
   /**
-   * This is a method which takes the value of solrQuery and then execute query with solr
-   * client and after execution it parse result into Case Class and create a List[CaseClass].
-   *
-   * @param keyValue : value for search
-   * @return
-   */
+    * This is a method which takes the value of solrQuery and then execute query with solr
+    * client and after execution it parse result into Case Class and create a List[CaseClass].
+    *
+    * @param keyValue : value for search
+    * @return
+    */
   def fetchData(keyValue: String): Option[List[BookDetails]] = {
     try {
       val solrClient = getClientConnection()
@@ -100,70 +85,71 @@ class SolrClientAccess @Inject()(solrClientForInsert: SolrClient) {
         None
     }
   }
+
+  /**
+    * This method creates solr connection.
+    *
+    * @return
+    */
+  def getClientConnection(): HttpSolrClient = {
+    val url_final = url + collection_name
+    val solrClient: HttpSolrClient = new HttpSolrClient.Builder(url_final).build()
+    solrClient.setParser(new XMLResponseParser())
+    solrClient
+  }
 }
 
 class SolrAccess @Inject()(solrClientAccess: SolrClientAccess) {
 
   /**
-   * This method takes a parameter of Book_Details and then insert data or update data if that is
-   * present into solr collection. It match unique key and in our case that is id.
-   *
-   * @param book_Details
-   * @return
-   */
+    * This method takes a parameter of Book_Details and then insert data or update data if that is
+    * present into solr collection. It match unique key and in our case that is id.
+    *
+    * @param book_Details
+    * @return
+    */
 
   def createOrUpdateRecord(book_Details: BookDetails): Option[Int] = {
     solrClientAccess.insertRecord(book_Details)
   }
 
   /**
-   * This method will return total count of records in your solr
-   *
-   * @return
-   */
+    * This method will return total count of records in your solr
+    *
+    * @return
+    */
 
   def findAllRecord: Option[List[BookDetails]] = {
-    try {
-      solrClientAccess.fetchData("*:*") match {
-        case Some(data) => Some(data)
-        case None => None
-      }
-    } catch {
-      case solrServerException: SolrServerException =>
-        println("Solr Server Exception : " + solrServerException.getMessage)
-        None
+
+    solrClientAccess.fetchData("*:*") match {
+      case Some(data) => Some(data)
+      case None => None
     }
   }
 
   /**
-   * This method will take a keyword and fetch all the record related to that keyword
-   *
-   * @param keyword eg: fantasy
-   * @return total count of the record
-   */
+    * This method will take a keyword and fetch all the record related to that keyword
+    *
+    * @param keyword eg: fantasy
+    * @return total count of the record
+    */
 
   def findRecordWithKeyword(keyword: String): Option[List[BookDetails]] = {
     solrClientAccess.fetchData(keyword)
   }
 
   /**
-   * This method will take a key and value, after this it will fetch all the record related to
-   * that
-   * key and value. eg: ("name", "scala")
-   *
-   * @param key   : name
-   * @param value : scala
-   * @return
-   */
+    * This method will take a key and value, after this it will fetch all the record related to
+    * that
+    * key and value. eg: ("name", "scala")
+    *
+    * @param key   : name
+    * @param value : scala
+    * @return
+    */
 
   def findRecordWithKeyAndValue(key: String, value: String): Option[List[BookDetails]] = {
-    try {
-      val keyValue = s"$key:" + s"${ value.trim }"
-      solrClientAccess.fetchData(keyValue)
-    } catch {
-      case solrServerException: SolrServerException =>
-        println("Solr Server Exception : " + solrServerException.getMessage)
-        None
-    }
+    val keyValue = s"$key:" + s"${value.trim}"
+    solrClientAccess.fetchData(keyValue)
   }
 }
