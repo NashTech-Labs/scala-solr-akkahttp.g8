@@ -10,8 +10,8 @@
   <inceptionYear>2015</inceptionYear>
   <licenses>
     <license>
-      <name>My License</name>
-      <url>http://....</url>
+      <name>knoldus</name>
+      <url>http://www.knoldus.com</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -32,7 +32,6 @@
     <akka_http_spray_json_experimental.version>2.4.11.1</akka_http_spray_json_experimental.version>
     <slf4j.version>1.7.23</slf4j.version>
     <junit.version>4.11</junit.version>
-    <spec2.version>3.8.8</spec2.version>
     <scalatest.version>2.2.6</scalatest.version>
     <mokito.version>1.10.19</mokito.version>
     <solr_core.version>6.4.1</solr_core.version>
@@ -55,12 +54,6 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
       <version>${solr.version}</version>
-      <!--<exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>-->
     </dependency>
     <dependency>
       <groupId>com.typesafe</groupId>
@@ -110,13 +103,13 @@
 
     <dependency>
       <groupId>org.json4s</groupId>
-      <artifactId>json4s-jackson_2.11</artifactId>
+      <artifactId>json4s-jackson_${scala.compact.version}</artifactId>
       <version>3.5.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.typesafe.scala-logging</groupId>
-      <artifactId>scala-logging_2.11</artifactId>
+      <artifactId>scala-logging_${scala.compact.version}</artifactId>
       <version>3.4.0</version>
     </dependency>
 
@@ -131,12 +124,6 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.specs2</groupId>
-      <artifactId>specs2-junit_${scala.compact.version}</artifactId>
-      <version>${spec2.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
