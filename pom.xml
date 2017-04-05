@@ -37,6 +37,7 @@
     <solr_core.version>6.4.1</solr_core.version>
     <akka_http_testkit.version>10.0.5</akka_http_testkit.version>
     <google_guice.version>4.1.0</google_guice.version>
+      <scoverage.plugin.version>1.3.0</scoverage.plugin.version>
   </properties>
 
   <dependencies>
@@ -177,6 +178,15 @@
           </execution>
         </executions>
       </plugin>
+        <plugin>
+            <groupId>org.scoverage</groupId>
+            <artifactId>scoverage-maven-plugin</artifactId>
+            <version>${scoverage.plugin.version}</version>
+            <configuration>
+                <scalaVersion>2.11.8</scalaVersion>
+                <scalacPluginVersion>1.3.0</scalacPluginVersion>
+            </configuration>
+        </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
