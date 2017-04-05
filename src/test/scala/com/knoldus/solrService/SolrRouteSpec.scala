@@ -1,4 +1,3 @@
-
 package com.knoldus.solrService
 
 import akka.http.scaladsl.model.HttpEntity

@@ -9,7 +9,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Sequential}
 
 @RunWith(classOf[JUnitRunner])
-class SolrAccessWithEmbedddedSolrSpec extends FunSuite with MockitoSugar with BeforeAndAfterAll {
+class SolrAccessWithEmbedddedSolrSuite extends FunSuite with MockitoSugar with BeforeAndAfterAll {
   Sequential
 
   var server: EmbeddedSolrServer = _
@@ -23,6 +23,7 @@ class SolrAccessWithEmbedddedSolrSpec extends FunSuite with MockitoSugar with Be
 
     server = new EmbeddedSolrServer(container, "test_embedded")
     val solrClientAccess = new SolrClientAccess(server,None)
+
     solrAccess = new SolrAccess(solrClientAccess)
 
     server.deleteByQuery("*:*")
