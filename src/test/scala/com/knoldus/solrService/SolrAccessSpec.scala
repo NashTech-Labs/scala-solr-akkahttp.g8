@@ -10,9 +10,9 @@ import org.scalatest.mock.MockitoSugar
 @RunWith(classOf[JUnitRunner])
 class SolrAccessSpec extends FunSuite with MockitoSugar {
 
+  val book = BookDetails("12", Array("science"), "chemistry", "Prateek", Some("second"), 1, "reference", true, 1.3, 22)
   private val solrAccessClient = mock[SolrClientAccess]
   private val solrAccess = new SolrAccess(solrAccessClient)
-  val book = BookDetails("12", Array("science"), "chemistry", "Prateek", Some("second"), 1, "reference", true, 1.3, 22)
 
   test("to create or update record if already created") {
     when(solrAccessClient.insertRecord(book)).thenReturn(Some(1))
@@ -45,5 +45,5 @@ class SolrAccessSpec extends FunSuite with MockitoSugar {
   }
 
 
-
 }
+
