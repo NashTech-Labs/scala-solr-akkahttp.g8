@@ -1,4 +1,4 @@
-/*
+
 package com.knoldus.solrService
 
 import akka.http.scaladsl.model.HttpEntity
@@ -204,4 +204,4 @@ class SolrRouteSpec extends WordSpec with Matchers with ScalatestRouteTest with 
     }
   }
 
-}*/
+}
