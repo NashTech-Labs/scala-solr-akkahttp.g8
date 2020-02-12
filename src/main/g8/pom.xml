@@ -34,7 +34,7 @@
     <junit.version>4.11</junit.version>
     <scalatest.version>2.2.6</scalatest.version>
     <mokito.version>1.10.19</mokito.version>
-    <solr_core.version>6.4.1</solr_core.version>
+    <solr_core.version>8.4.0</solr_core.version>
     <akka_http_testkit.version>10.0.5</akka_http_testkit.version>
     <google_guice.version>4.1.0</google_guice.version>
       <scalac.plugin.version>1.3.0</scalac.plugin.version>
